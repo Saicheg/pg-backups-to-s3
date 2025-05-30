@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    networks:
+      - postgres
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql/data
+      - ./fixtures/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 25
+
+  pgbackup:
+    image: saicheg/pg-backups-to-s3:17-latest
+    build:
+      context: .
+    volumes:
+      - ./.data/dumps:/opt/dumps
+    networks:
+      - postgres
+    environment:
+      # Required Database Configuration
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - TITLE="VONKA Development Backup"
+      - CRON_TIME="0 */12 * * *"
+      
+      # Encryption Configuration (Optional)
+      - ENCRYPTION_KEY=secure-phrase
+      - ENCRYPTION_METHOD=gpg
+      
+      # Compression Configuration (Optional)
+      - COMPRESSION_TYPE=gzip
+      
+      # S3 Configuration (Optional)
+      - S3_BUCKET=backups
+      - S3_PREFIX=backups
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      - AWS_DEFAULT_REGION=
+      
+      # Webhook Configuration (Optional)
+      # - WEBHOOK_URL=https://hooks.slack.com/services/
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  postgres:
