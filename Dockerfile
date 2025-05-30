@@ -13,9 +13,8 @@ RUN apk add --update --no-cache \
 
 WORKDIR /opt
 
-COPY backup.sh /opt/scripts/backup.sh
-COPY crontab /opt/crontab
 COPY entrypoint.sh /opt/scripts/entrypoint.sh
+COPY backup.sh /opt/scripts/backup.sh
 
 RUN chmod +x /opt/scripts/entrypoint.sh /opt/scripts/backup.sh \
     && touch /var/log/cron.log \

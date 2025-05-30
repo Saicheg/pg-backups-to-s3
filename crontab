@@ -1,1 +1,0 @@
-$CRON_TIME /opt/scripts/backup.sh >> /var/log/cron.log 2>&1
