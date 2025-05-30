@@ -68,22 +68,23 @@ jobs:
         id: version
         run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Create and push manifest for latest
+      - name: Create and push convenience tags
         run: |
-          # Create manifest for latest tag (points to pg17)
-          docker manifest create ${{ env.IMAGE_NAME }}:latest \
+          # Create latest tag (points to pg17-latest)
+          docker buildx imagetools create \
+            --tag ${{ env.IMAGE_NAME }}:latest \
             ${{ env.IMAGE_NAME }}:pg17-latest
           
-          docker manifest push ${{ env.IMAGE_NAME }}:latest
-          
-          # Create manifest for version tag (points to pg17)
-          docker manifest create ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }} \
-            ${{ env.IMAGE_NAME }}:pg17-${{ steps.version.outputs.version }}
-          
-          docker manifest push ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }} 
+          # Create version tag (points to pg17-version)
+          docker buildx imagetools create \
+            --tag ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }} \
+            ${{ env.IMAGE_NAME }}:pg17-${{ steps.version.outputs.version }} 
