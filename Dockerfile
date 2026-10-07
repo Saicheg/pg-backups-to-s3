@@ -15,8 +15,9 @@ WORKDIR /opt
 
 COPY entrypoint.sh /opt/scripts/entrypoint.sh
 COPY backup.sh /opt/scripts/backup.sh
+COPY restore-backup.sh /opt/scripts/restore-backup.sh
 
-RUN chmod +x /opt/scripts/entrypoint.sh /opt/scripts/backup.sh \
+RUN chmod +x /opt/scripts/entrypoint.sh /opt/scripts/backup.sh /opt/scripts/restore-backup.sh \
     && touch /var/log/cron.log \
     && echo -e "root\npostgres" > /etc/cron.allow
 

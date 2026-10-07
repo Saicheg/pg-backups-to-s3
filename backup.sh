@@ -39,7 +39,7 @@ send_webhook() {
         return 0
     fi
     
-    echo "Sending webhook notification to: $webhook_url" >&2
+    echo "Sending webhook notification" >&2
     echo "Title: $title" >&2
     echo "Status: $status" >&2
     
